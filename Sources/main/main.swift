@@ -9,18 +9,14 @@ import SwiftParser
 
 class PublicModifierRewriter: SyntaxRewriter {
     override func visit(_ node: ClassDeclSyntax) -> DeclSyntax {
-        print("🟣node:\(node.name)")
+        print("🟣node(ClassDeclSyntax):\(node.name)")
+        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+            return super.visit(node)
+        }
         let newModifiers = DeclModifierListSyntax([
-            DeclModifierSyntax(leadingTrivia: .newlines(1), name: .keyword(.public), trailingTrivia: .spaces(1))
+            DeclModifierSyntax(leadingTrivia: .newlines(2), name: .keyword(.public), trailingTrivia: .spaces(1))
         ])
-        return DeclSyntax(node.with(\.modifiers, newModifiers))
-//        return super.visit(node.with(\.modifiers, newModifiers).cast(DeclSyntax.self))
-//        return super.visit(node)
-        
-//        super.visit(node)
-//        return node.with(\.modifiers, newModifiers).cast(DeclSyntax.self)
-        
-//        return visit(node.with(\.modifiers, newModifiers).cast(DeclSyntax.self))
+        return super.visit(DeclSyntax(node.with(\.modifiers, newModifiers)))
     }
 }
 
