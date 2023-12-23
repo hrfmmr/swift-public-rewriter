@@ -2,15 +2,23 @@ import Foundation
 import SwiftUI
 
 class Baz {
-    let x: String
+    let bazX: Int
+    var bazY: Int?
+    private (set) var hoge: String?
+    lazy var lz: String = {
+        "lazy"
+    }()
     
-    init(x: String) {
-        self.x = x
+    init(x: Int) {
+        self.bazX = x
     }
     
-    func doSomething() {}
+    func doSomething() {
+        let s = ""
+        var i = 0
+    }
     
     class InnerBaz {
-        var xx: Int = 0
+        let xx: Int = 0
     }
 }
