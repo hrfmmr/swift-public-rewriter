@@ -117,5 +117,29 @@ class PublicModifierRewriter: SyntaxRewriter {
             .with(\.modifiers, newModifiers)
         return super.visit(DeclSyntax(newNode))
     }
+    
+    override func visit(_ node: InitializerDeclSyntax) -> DeclSyntax {
+        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+            return super.visit(node)
+        }
+        print("🔵node(InitializerDeclSyntax):\(node.description)")
+        guard node.modifiers.isEmpty else { return super.visit(node) }
+
+        let newModifiers = DeclModifierListSyntax([
+            DeclModifierSyntax(
+                leadingTrivia: .newlines(2),
+                name: .keyword(.public),
+                trailingTrivia: .spaces(1)
+            )
+        ])
+        let newNode = node.with(
+            \.initKeyword,
+             .keyword(.`init`)
+        )
+            .with(\.modifiers, newModifiers)
+            .cast(InitializerDeclSyntax.self)
+
+        return super.visit(newNode)
+    }
 }
 
