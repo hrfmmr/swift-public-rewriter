@@ -108,6 +108,18 @@ class PublicModifierRewriter: SyntaxRewriter {
             .with(\.modifiers, makePublicDeclModifier())
         return super.visit(DeclSyntax(newNode))
     }
+
+    override func visit(_ node: EnumDeclSyntax) -> DeclSyntax {
+        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+            return super.visit(node)
+        }
+        print("🟣node(EnumDeclSyntax):\(node.name)")
+        guard node.modifiers.isEmpty else { return super.visit(node) }
+        let newNode = node
+            .with(\.enumKeyword, .keyword(.enum, trailingTrivia: .spaces(1)))
+            .with(\.modifiers, makePublicDeclModifier())
+        return super.visit(DeclSyntax(newNode))
+    }
     
     override func visit(_ node: ClassDeclSyntax) -> DeclSyntax {
         if node.modifiers.contains(where: { $0.name.text == "public" }) {
