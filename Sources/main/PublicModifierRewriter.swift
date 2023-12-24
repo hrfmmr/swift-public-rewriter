@@ -96,6 +96,18 @@ class PublicModifierRewriter: SyntaxRewriter {
             .with(\.modifiers, newModifiers)
         return super.visit(newNode)
     }
+
+    override func visit(_ node: StructDeclSyntax) -> DeclSyntax {
+        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+            return super.visit(node)
+        }
+        print("🟣node(StructDeclSyntax):\(node.name)")
+        guard node.modifiers.isEmpty else { return super.visit(node) }
+        let newNode = node
+            .with(\.structKeyword, .keyword(.struct, trailingTrivia: .spaces(1)))
+            .with(\.modifiers, makePublicDeclModifier())
+        return super.visit(DeclSyntax(newNode))
+    }
     
     override func visit(_ node: ClassDeclSyntax) -> DeclSyntax {
         if node.modifiers.contains(where: { $0.name.text == "public" }) {
