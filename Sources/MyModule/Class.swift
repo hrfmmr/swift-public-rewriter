@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-class Baz {
+class ExampleClass {
     let bazX: Int
     var bazY: Int?
     private (set) var hoge: String?

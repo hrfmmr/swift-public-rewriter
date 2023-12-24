@@ -1,6 +1,6 @@
 import Foundation
 
-struct Foo {
+struct ExampleStruct {
     let x: Int
     var y: Int
 }

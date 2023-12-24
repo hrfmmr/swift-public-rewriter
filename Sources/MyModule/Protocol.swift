@@ -1,1 +1,1 @@
-protocol Hoge {}
+protocol ExampleProtocol {}
