@@ -52,7 +52,7 @@ private extension VariableDeclSyntax {
     
     
     enum MakePublicDeclPattern {
-        /// No access scope(internal)
+        /// No access scope defined(internal)
         /// `let ...`
         /// `var ...`
         case defaultInternal
@@ -74,6 +74,39 @@ private extension VariableDeclSyntax {
                 nil
             }
         }
+    }
+}
+
+private extension SyntaxProtocol {
+    /// for `struct`, `enum`, `class`, etc..
+    var shouldMakePublicInExtension: Bool {
+        guard
+            isDefinedInExtension(ofDeclModifierString: "private") == false,
+            isDefinedInExtension(ofDeclModifierString: "public") == false
+        else { return false }
+        return true
+    }
+
+    /// for `struct`, `enum`, `class`, etc..
+    func isDefinedInExtension(ofDeclModifierString declModifierString: String) -> Bool {
+        precondition(["private", "public"].contains(declModifierString))
+        
+        var ancestor = parent
+        while let this = ancestor, this.is(CodeBlockItemSyntax.self) == false {
+            ancestor = ancestor?.parent
+            guard ancestor != nil else {
+                assertionFailure("❗️Unexpected AST tree. `CodeBlockItemSyntax` must exist on ancestors.")
+                return false
+            }
+            
+            if let extNode = ancestor!.as(ExtensionDeclSyntax.self) {
+                let modifiers = Array(extNode.modifiers)
+                if modifiers.count == 1, modifiers[0].name.text == declModifierString {
+                    return true
+                }
+            }
+        }
+        return false
     }
 }
 
@@ -102,6 +135,8 @@ class PublicModifierRewriter: SyntaxRewriter {
             return super.visit(node)
         }
         print("🟣node(StructDeclSyntax):\(node.name)")
+        guard node.shouldMakePublicInExtension else { return super.visit(node) }
+        
         guard node.modifiers.isEmpty else { return super.visit(node) }
         let newNode = node
             .with(\.structKeyword, .keyword(.struct, trailingTrivia: .spaces(1)))
@@ -114,6 +149,8 @@ class PublicModifierRewriter: SyntaxRewriter {
             return super.visit(node)
         }
         print("🟣node(EnumDeclSyntax):\(node.name)")
+        guard node.shouldMakePublicInExtension else { return super.visit(node) }
+
         guard node.modifiers.isEmpty else { return super.visit(node) }
         let newNode = node
             .with(\.enumKeyword, .keyword(.enum, trailingTrivia: .spaces(1)))
@@ -126,6 +163,8 @@ class PublicModifierRewriter: SyntaxRewriter {
             return super.visit(node)
         }
         print("🟣node(ClassDeclSyntax):\(node.name)")
+        guard node.shouldMakePublicInExtension else { return super.visit(node) }
+
         guard node.modifiers.isEmpty else { return super.visit(node) }
         let newNode = node
             .with(\.classKeyword, .keyword(.class, trailingTrivia: .spaces(1)))
