@@ -103,18 +103,9 @@ class PublicModifierRewriter: SyntaxRewriter {
         }
         print("🟣node(ClassDeclSyntax):\(node.name)")
         guard node.modifiers.isEmpty else { return super.visit(node) }
-        let newModifiers = DeclModifierListSyntax([
-            DeclModifierSyntax(
-                leadingTrivia: .newlines(2),
-                name: .keyword(.public),
-                trailingTrivia: .spaces(1)
-            )
-        ])
-        let newNode = node.with(
-            \.classKeyword,
-             .keyword(.class, trailingTrivia: .spaces(1))
-        )
-            .with(\.modifiers, newModifiers)
+        let newNode = node
+            .with(\.classKeyword, .keyword(.class, trailingTrivia: .spaces(1)))
+            .with(\.modifiers, makePublicDeclModifier())
         return super.visit(DeclSyntax(newNode))
     }
     
@@ -125,21 +116,36 @@ class PublicModifierRewriter: SyntaxRewriter {
         print("🔵node(InitializerDeclSyntax):\(node.description)")
         guard node.modifiers.isEmpty else { return super.visit(node) }
 
-        let newModifiers = DeclModifierListSyntax([
-            DeclModifierSyntax(
-                leadingTrivia: .newlines(2),
-                name: .keyword(.public),
-                trailingTrivia: .spaces(1)
-            )
-        ])
-        let newNode = node.with(
-            \.initKeyword,
-             .keyword(.`init`)
-        )
-            .with(\.modifiers, newModifiers)
+        let newNode = node
+            .with(\.initKeyword, .keyword(.`init`))
+            .with(\.modifiers, makePublicDeclModifier())
             .cast(InitializerDeclSyntax.self)
+
+        return super.visit(newNode)
+    }
+
+    override func visit(_ node: FunctionDeclSyntax) -> DeclSyntax {
+        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+            return super.visit(node)
+        }
+        print("🔵node(FunctionDeclSyntax):\(node.description)")
+        guard node.modifiers.isEmpty else { return super.visit(node) }
+
+        let newNode = node
+            .with(\.funcKeyword, .keyword(.func, trailingTrivia: .spaces(1)))
+            .with(\.modifiers, makePublicDeclModifier())
+            .cast(FunctionDeclSyntax.self)
 
         return super.visit(newNode)
     }
 }
 
+private func makePublicDeclModifier() -> DeclModifierListSyntax {
+    DeclModifierListSyntax([
+        DeclModifierSyntax(
+            leadingTrivia: .newlines(2),
+            name: .keyword(.public),
+            trailingTrivia: .spaces(1)
+        )
+    ])
+}

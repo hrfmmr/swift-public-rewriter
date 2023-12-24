@@ -1,6 +1,6 @@
 import Foundation
 
 struct Foo {
-    let x: Int
-    var y: Int
+public let x: Int
+public var y: Int
 }
