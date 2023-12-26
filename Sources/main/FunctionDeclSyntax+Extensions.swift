@@ -1,7 +1,30 @@
 import SwiftSyntax
 
 extension FunctionDeclSyntax {
-    var hasStaticModifier: Bool {
+    private enum MakePublicDeclPattern {
+        /// No modifiers
+        case normalFunc
+        
+        /// `static func`
+        case staticFunc
+        
+        /// `override func`
+        case overrideFunc
+        
+        static func from(_ node: FunctionDeclSyntax) -> Self? {
+            if node.hasStaticModifier {
+                .staticFunc
+            } else if node.hasOverrideModifier {
+                .overrideFunc
+            } else if node.modifiers.isEmpty {
+                .normalFunc
+            } else {
+                nil
+            }
+        }
+    }
+
+    private var hasStaticModifier: Bool {
         let modifiers = Array(modifiers)
         guard modifiers.count == 1 else { return false }
         let modifier = modifiers[0]
@@ -9,7 +32,7 @@ extension FunctionDeclSyntax {
         return true
     }
     
-    var hasOverrideModifier: Bool {
+    private var hasOverrideModifier: Bool {
         let modifiers = Array(modifiers)
         guard modifiers.count == 1 else { return false }
         let modifier = modifiers[0]
@@ -45,29 +68,6 @@ extension FunctionDeclSyntax {
             modifiers.append(existingModifier)
         }
         return modifiers
-    }
-    
-    enum MakePublicDeclPattern {
-        /// No modifiers
-        case normalFunc
-        
-        /// `static func`
-        case staticFunc
-        
-        /// `override func`
-        case overrideFunc
-        
-        static func from(_ node: FunctionDeclSyntax) -> Self? {
-            if node.hasStaticModifier {
-                .staticFunc
-            } else if node.hasOverrideModifier {
-                .overrideFunc
-            } else if node.modifiers.isEmpty {
-                .normalFunc
-            } else {
-                nil
-            }
-        }
-    }
+    }    
 }
 

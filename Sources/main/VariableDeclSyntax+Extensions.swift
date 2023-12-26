@@ -1,18 +1,45 @@
 import SwiftSyntax
 
 extension VariableDeclSyntax {
+    private enum MakePublicDeclPattern {
+        /// No access scope defined(internal)
+        /// `let ...`
+        /// `var ...`
+        case defaultInternal
+        
+        /// internal scope of `private(set) var ...`
+        case internalPrivateSetVar
+        
+        /// internal scope of `lazy var ...`
+        case internalLazyVar
+        
+        static func from(_ node: VariableDeclSyntax) -> Self? {
+            if node.hasPrivateSetVar {
+                .internalPrivateSetVar
+            } else if node.hasLazyVar {
+                .internalLazyVar
+            } else if node.modifiers.isEmpty {
+                .defaultInternal
+            } else {
+                nil
+            }
+        }
+    }
+
     /// Whether `private(set) var ...`
-    var hasPrivateSetVar: Bool {
+    private var hasPrivateSetVar: Bool {
         let modifiers = Array(modifiers)
         guard modifiers.count == 1 else { return false }
         let modifier = modifiers[0]
-        guard modifier.name.text == "private", let detail = modifier.detail, detail.detail.text == "set"
+        guard
+            modifier.name.text == "private",
+            let detail = modifier.detail, detail.detail.text == "set"
         else { return false }
         return true
     }
     
     /// Whether `lazy var ...`
-    var hasLazyVar: Bool {
+    private var hasLazyVar: Bool {
         let modifiers = Array(modifiers)
         guard modifiers.count == 1 else { return false }
         let modifier = modifiers[0]
@@ -48,32 +75,5 @@ extension VariableDeclSyntax {
             modifiers.append(existingModifier)
         }
         return modifiers
-    }
-    
-    
-    enum MakePublicDeclPattern {
-        /// No access scope defined(internal)
-        /// `let ...`
-        /// `var ...`
-        case defaultInternal
-        
-        /// internal scope of `private(set) var ...`
-        case internalPrivateSetVar
-        
-        /// internal scope of `lazy var ...`
-        case internalLazyVar
-        
-        static func from(_ node: VariableDeclSyntax) -> Self? {
-            if node.hasPrivateSetVar {
-                .internalPrivateSetVar
-            } else if node.hasLazyVar {
-                .internalLazyVar
-            } else if node.modifiers.isEmpty {
-                .defaultInternal
-            } else {
-                nil
-            }
-        }
-    }
+    }    
 }
-

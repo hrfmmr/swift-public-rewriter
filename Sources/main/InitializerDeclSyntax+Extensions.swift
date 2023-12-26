@@ -1,7 +1,25 @@
 import SwiftSyntax
 
 extension InitializerDeclSyntax {
-    var hasOverrideModifier: Bool {
+    private enum MakePublicDeclPattern {
+        /// No modifiers
+        case normalInit
+        
+        /// `override init`
+        case overrideInit
+        
+        static func from(_ node: InitializerDeclSyntax) -> Self? {
+            if node.hasOverrideModifier {
+                .overrideInit
+            } else if node.modifiers.isEmpty {
+                .normalInit
+            } else {
+                nil
+            }
+        }
+    }
+
+    private var hasOverrideModifier: Bool {
         let modifiers = Array(modifiers)
         guard modifiers.count == 1 else { return false }
         let modifier = modifiers[0]
@@ -31,23 +49,5 @@ extension InitializerDeclSyntax {
             modifiers.append(existingModifier)
         }
         return modifiers
-    }
-
-    enum MakePublicDeclPattern {
-        /// No modifiers
-        case normalInit
-        
-        /// `override init`
-        case overrideInit
-        
-        static func from(_ node: InitializerDeclSyntax) -> Self? {
-            if node.hasOverrideModifier {
-                .overrideInit
-            } else if node.modifiers.isEmpty {
-                .normalInit
-            } else {
-                nil
-            }
-        }
     }
 }
