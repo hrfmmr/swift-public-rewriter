@@ -30,7 +30,7 @@ class PublicModifierRewriter: SyntaxRewriter {
         guard node.modifiers.isEmpty else { return super.visit(node) }
         let newNode = node
             .with(\.structKeyword, .keyword(.struct, trailingTrivia: .spaces(1)))
-            .with(\.modifiers, makePublicDeclModifier())
+            .with(\.modifiers, makePublicDeclModifier(leadingTrivia: node.structKeyword.leadingTrivia))
         return super.visit(DeclSyntax(newNode))
     }
 
@@ -44,7 +44,7 @@ class PublicModifierRewriter: SyntaxRewriter {
         guard node.modifiers.isEmpty else { return super.visit(node) }
         let newNode = node
             .with(\.enumKeyword, .keyword(.enum, trailingTrivia: .spaces(1)))
-            .with(\.modifiers, makePublicDeclModifier())
+            .with(\.modifiers, makePublicDeclModifier(leadingTrivia: node.enumKeyword.leadingTrivia))
         return super.visit(DeclSyntax(newNode))
     }
     
@@ -58,7 +58,7 @@ class PublicModifierRewriter: SyntaxRewriter {
         guard node.modifiers.isEmpty else { return super.visit(node) }
         let newNode = node
             .with(\.classKeyword, .keyword(.class, trailingTrivia: .spaces(1)))
-            .with(\.modifiers, makePublicDeclModifier())
+            .with(\.modifiers, makePublicDeclModifier(leadingTrivia: node.classKeyword.leadingTrivia))
         return super.visit(DeclSyntax(newNode))
     }
     
@@ -103,18 +103,33 @@ class PublicModifierRewriter: SyntaxRewriter {
 
         let newNode = node
             .with(\.extensionKeyword, .keyword(.extension, trailingTrivia: .spaces(1)))
-            .with(\.modifiers, makePublicDeclModifier())
+            .with(\.modifiers, makePublicDeclModifier(leadingTrivia: node.extensionKeyword.leadingTrivia))
             .cast(ExtensionDeclSyntax.self)
+
+        return super.visit(newNode)
+    }
+    
+    override func visit(_ node: ProtocolDeclSyntax) -> DeclSyntax {
+        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+            return super.visit(node)
+        }
+        print("🔴node(ExtensionDeclSyntax):\(node.description)")
+        guard node.modifiers.isEmpty else { return super.visit(node) }
+
+        let newNode = node
+            .with(\.protocolKeyword, .keyword(.protocol, trailingTrivia: .spaces(1)))
+            .with(\.modifiers, makePublicDeclModifier(leadingTrivia: node.protocolKeyword.leadingTrivia))
+            .cast(ProtocolDeclSyntax.self)
 
         return super.visit(newNode)
     }
 }
 
 private extension PublicModifierRewriter {
-    func makePublicDeclModifier() -> DeclModifierListSyntax {
+    func makePublicDeclModifier(leadingTrivia: Trivia) -> DeclModifierListSyntax {
         DeclModifierListSyntax([
             DeclModifierSyntax(
-                leadingTrivia: .newlines(2),
+                leadingTrivia: leadingTrivia,
                 name: .keyword(.public),
                 trailingTrivia: .spaces(1)
             )

@@ -23,7 +23,7 @@ extension VariableDeclSyntax {
     static func makeNewPublicModifiers(from node: VariableDeclSyntax) -> DeclModifierListSyntax? {
         guard let pattern = MakePublicDeclPattern.from(node) else { return nil }
         let publicModifier = DeclModifierSyntax(
-            leadingTrivia: .newlines(1),
+            leadingTrivia: node.leadingTrivia,
             name: .keyword(.public),
             trailingTrivia: .spaces(1)
         )
