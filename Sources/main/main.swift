@@ -1,6 +1,9 @@
 import Foundation
 
+import SwiftSyntax
 import SwiftParser
+
+import Rewriter
 
 func makePublic(in source: String) throws -> String {
     let sourceFile = Parser.parse(source: source)
@@ -29,7 +32,7 @@ func main() throws {
 }
 
 do {
-    try main()
+   try main()
 } catch {
-    print("❗error:\(error)")
+   print("❗error:\(error)")
 }
