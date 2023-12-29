@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swiftsyntax-sandbox",
+    name: "swift-public-rewriter",
     platforms: [
         .iOS(.v16),
         .macOS(.v10_15),
@@ -29,6 +29,12 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+            ]
+        ),
+        .testTarget(
+            name: "RewriterTests",
+            dependencies: [
+                "Rewriter",
             ]
         ),
     ]

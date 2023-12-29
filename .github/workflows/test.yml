@@ -1,0 +1,28 @@
+name: CI
+on: push
+jobs:
+  test:
+    runs-on: macos-13-arm64
+    strategy:
+      matrix:
+        xcode: ['/Applications/Xcode_15.1.app/Contents/Developer']
+    steps:
+      - name: 👣 Checkout
+        uses: actions/checkout@v4
+
+      # Build
+      - name: 🔨 Build
+        run: make build
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode }}
+
+      # Test
+      - name: 🔍 Test
+        run: make test
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode }}
+      - name: 📦 Store test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/reports
