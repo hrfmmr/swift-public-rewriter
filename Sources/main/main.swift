@@ -3,7 +3,7 @@ import Foundation
 import SwiftSyntax
 import SwiftParser
 
-import Rewriter
+import PublicRewriter
 
 func makePublic(in source: String) throws -> String {
     let sourceFile = Parser.parse(source: source)

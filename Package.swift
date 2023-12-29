@@ -9,7 +9,7 @@ let package = Package(
         .macOS(.v10_15),
     ],
     products: [
-        .library(name: "Rewriter", targets: ["Rewriter"]),
+        .library(name: "PublicRewriter", targets: ["PublicRewriter"]),
     ],
     dependencies: [
       .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.2"),
@@ -20,21 +20,21 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
-                "Rewriter",
+                "PublicRewriter",
             ]
         ),
         .target(name: "MyModule"),
         .target(
-            name: "Rewriter",
+            name: "PublicRewriter",
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
             ]
         ),
         .testTarget(
-            name: "RewriterTests",
+            name: "PublicRewriterTests",
             dependencies: [
-                "Rewriter",
+                "PublicRewriter",
             ]
         ),
     ]
