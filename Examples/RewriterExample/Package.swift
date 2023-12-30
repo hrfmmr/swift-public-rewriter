@@ -3,30 +3,27 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-public-rewriter",
+    name: "swift-public-rewriter-example",
     platforms: [
         .iOS(.v16),
         .macOS(.v10_15),
     ],
     products: [
-        .library(name: "PublicRewriter", targets: ["PublicRewriter"]),
+        .library(name: "MyModule", targets: ["MyModule"]),
     ],
     dependencies: [
       .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.2"),
+      .package(name: "swift-public-rewriter", path: "../../"),
     ],
     targets: [
-        .target(
-            name: "PublicRewriter",
+        .executableTarget(
+            name: "main",
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+                .product(name: "PublicRewriter", package: "swift-public-rewriter"),
             ]
         ),
-        .testTarget(
-            name: "PublicRewriterTests",
-            dependencies: [
-                "PublicRewriter",
-            ]
-        ),
+        .target(name: "MyModule"),
     ]
 )

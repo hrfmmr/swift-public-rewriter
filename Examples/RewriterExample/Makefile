@@ -2,6 +2,6 @@
 build:
 	@swift build
 
-.PHONY: test
-test:
-	@swift test
+.PHONY: run
+run:
+	@swift run
