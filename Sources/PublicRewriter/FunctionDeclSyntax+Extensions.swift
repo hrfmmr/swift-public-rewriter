@@ -11,11 +11,16 @@ extension FunctionDeclSyntax {
         /// `override func`
         case overrideFunc
         
+        /// `mutating func`
+        case mutatingFunc
+        
         static func from(_ node: FunctionDeclSyntax) -> Self? {
             if node.hasStaticModifier {
                 .staticFunc
             } else if node.hasOverrideModifier {
                 .overrideFunc
+            } else if node.hasMutatingModifier {
+                .mutatingFunc
             } else if node.modifiers.isEmpty {
                 .normalFunc
             } else {
@@ -38,6 +43,26 @@ extension FunctionDeclSyntax {
         let modifier = modifiers[0]
         guard modifier.name.text == "override" else { return false }
         return true
+    }
+    
+    private var hasMutatingModifier: Bool {
+        let modifiers = Array(modifiers)
+        guard modifiers.count == 1 else { return false }
+        let modifier = modifiers[0]
+        guard modifier.name.text == "mutating" else { return false }
+        var ancestor = parent
+        while let this = ancestor, this.is(CodeBlockItemSyntax.self) == false {
+            ancestor = ancestor?.parent
+            guard ancestor != nil else {
+                assertionFailure("❗️Unexpected AST tree. `CodeBlockItemSyntax` must exist on ancestors.")
+                return false
+            }
+            
+            if let structNode = ancestor!.as(StructDeclSyntax.self) {
+                return true
+            }
+        }
+        return false
     }
     
     static func makeNewPublicModifiers(from node: FunctionDeclSyntax) -> DeclModifierListSyntax? {
@@ -63,6 +88,12 @@ extension FunctionDeclSyntax {
         case .overrideFunc:
             let existingModifier = DeclModifierSyntax(
                 name: .keyword(.override),
+                trailingTrivia: .spaces(1)
+            )
+            modifiers.append(existingModifier)
+        case .mutatingFunc:
+            let existingModifier = DeclModifierSyntax(
+                name: .keyword(.mutating),
                 trailingTrivia: .spaces(1)
             )
             modifiers.append(existingModifier)
