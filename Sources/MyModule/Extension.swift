@@ -19,3 +19,13 @@ public extension ExamplePublicStruct {
     enum InnerPublicExampleEnum {}
     class InnerPublicExampleClass {}
 }
+
+protocol TestProtocol {
+    func test()
+}
+
+struct Foo {}
+
+extension Foo: TestProtocol {
+    func test() {}
+}

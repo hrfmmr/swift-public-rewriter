@@ -75,7 +75,7 @@ public class PublicModifierRewriter: SyntaxRewriter {
         if node.modifiers.contains(where: { $0.name.text == "public" }) {
             return super.visit(node)
         }
-        guard let newModifiers = FunctionDeclSyntax.makeNewPublicModifiers(from: node) else { return super.visit(node)}
+        guard let newModifiers = FunctionDeclSyntax.makeNewPublicModifiers(from: node) else { return super.visit(node) }
 
         let newNode = node
             .with(\.funcKeyword, .keyword(.func, trailingTrivia: .spaces(1)))
@@ -89,11 +89,11 @@ public class PublicModifierRewriter: SyntaxRewriter {
         if node.modifiers.contains(where: { $0.name.text == "public" }) {
             return super.visit(node)
         }
-        guard node.modifiers.isEmpty else { return super.visit(node) }
+        guard let newModifiers = ExtensionDeclSyntax.makeNewPublicModifiers(from: node) else { return super.visit(node) }
 
         let newNode = node
             .with(\.extensionKeyword, .keyword(.extension, trailingTrivia: .spaces(1)))
-            .with(\.modifiers, makePublicDeclModifier(leadingTrivia: node.extensionKeyword.leadingTrivia))
+            .with(\.modifiers, newModifiers)
             .cast(ExtensionDeclSyntax.self)
 
         return super.visit(newNode)
@@ -125,37 +125,3 @@ private extension PublicModifierRewriter {
         ])
     }
 }
-
-private extension SyntaxProtocol {
-    /// for `struct`, `enum`, `class`, etc..
-    var shouldMakePublicInExtension: Bool {
-        guard
-            isDefinedInExtension(ofDeclModifierString: "private") == false,
-            isDefinedInExtension(ofDeclModifierString: "public") == false
-        else { return false }
-        return true
-    }
-
-    /// for `struct`, `enum`, `class`, etc..
-    func isDefinedInExtension(ofDeclModifierString declModifierString: String) -> Bool {
-        precondition(["private", "public"].contains(declModifierString))
-        
-        var ancestor = parent
-        while let this = ancestor, this.is(CodeBlockItemSyntax.self) == false {
-            ancestor = ancestor?.parent
-            guard ancestor != nil else {
-                assertionFailure("❗️Unexpected AST tree. `CodeBlockItemSyntax` must exist on ancestors.")
-                return false
-            }
-            
-            if let extNode = ancestor!.as(ExtensionDeclSyntax.self) {
-                let modifiers = Array(extNode.modifiers)
-                if modifiers.count == 1, modifiers[0].name.text == declModifierString {
-                    return true
-                }
-            }
-        }
-        return false
-    }
-}
-

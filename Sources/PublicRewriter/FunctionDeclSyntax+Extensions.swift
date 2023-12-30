@@ -13,6 +13,9 @@ extension FunctionDeclSyntax {
         
         /// `mutating func`
         case mutatingFunc
+
+        /// defined as a protocol conformance
+        case protocolConformance
         
         static func from(_ node: FunctionDeclSyntax) -> Self? {
             if node.hasStaticModifier {
@@ -21,6 +24,10 @@ extension FunctionDeclSyntax {
                 .overrideFunc
             } else if node.hasMutatingModifier {
                 .mutatingFunc
+            } else if node.isDefinedInProtocol {
+                nil
+            } else if node.isDefinedAsProtocolConformance {
+                .protocolConformance
             } else if node.modifiers.isEmpty {
                 .normalFunc
             } else {
@@ -50,19 +57,22 @@ extension FunctionDeclSyntax {
         guard modifiers.count == 1 else { return false }
         let modifier = modifiers[0]
         guard modifier.name.text == "mutating" else { return false }
-        var ancestor = parent
-        while let this = ancestor, this.is(CodeBlockItemSyntax.self) == false {
-            ancestor = ancestor?.parent
-            guard ancestor != nil else {
-                assertionFailure("❗️Unexpected AST tree. `CodeBlockItemSyntax` must exist on ancestors.")
-                return false
-            }
-            
-            if let structNode = ancestor!.as(StructDeclSyntax.self) {
-                return true
-            }
-        }
-        return false
+
+        guard let _ = findAncestorNode(of: StructDeclSyntax.self, baseNodeType: CodeBlockItemSyntax.self)
+        else { return false }
+        return true
+    }
+    
+    private var isDefinedInProtocol: Bool {
+        guard let _ = findAncestorNode(of: ProtocolDeclSyntax.self, baseNodeType: CodeBlockItemSyntax.self)
+        else { return false }
+        return true
+    }
+
+    private var isDefinedAsProtocolConformance: Bool {
+        guard let extNode = findAncestorNode(of: ExtensionDeclSyntax.self, baseNodeType: CodeBlockItemSyntax.self)
+        else { return false }
+        return extNode.inheritanceClause != nil
     }
     
     static func makeNewPublicModifiers(from node: FunctionDeclSyntax) -> DeclModifierListSyntax? {
@@ -77,7 +87,7 @@ extension FunctionDeclSyntax {
         ])
         
         switch pattern {
-        case .normalFunc:
+        case .normalFunc, .protocolConformance:
             break
         case .staticFunc:
             let existingModifier = DeclModifierSyntax(
