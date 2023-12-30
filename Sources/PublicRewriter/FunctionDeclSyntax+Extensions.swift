@@ -18,14 +18,14 @@ extension FunctionDeclSyntax {
         case protocolConformance
         
         static func from(_ node: FunctionDeclSyntax) -> Self? {
-            if node.hasStaticModifier {
+            if node.isDefinedInProtocol {
+                nil
+            } else if node.hasStaticModifier {
                 .staticFunc
             } else if node.hasOverrideModifier {
                 .overrideFunc
             } else if node.hasMutatingModifier {
                 .mutatingFunc
-            } else if node.isDefinedInProtocol {
-                nil
             } else if node.isDefinedAsProtocolConformance {
                 .protocolConformance
             } else if node.modifiers.isEmpty {

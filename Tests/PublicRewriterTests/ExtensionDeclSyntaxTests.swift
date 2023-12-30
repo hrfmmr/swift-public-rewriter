@@ -55,27 +55,30 @@ public extension ExamplePublicStruct {
         XCTAssertEqual(modifiedSource.description, expected)
     }
 
-
     func testRewriter_withInheritanceClause() throws {
         let source = """
 protocol TestProtocol {
+    var x: Int { get }
     func test()
 }
 
 struct Foo {}
 
 extension Foo: TestProtocol {
+    var x: Int { 0 }
     func test() {}
 }
 """
         let expected = """
 public protocol TestProtocol {
+    var x: Int { get }
     func test()
 }
 
 public struct Foo {}
 
 extension Foo: TestProtocol {
+    public var x: Int { 0 }
     public func test() {}
 }
 """

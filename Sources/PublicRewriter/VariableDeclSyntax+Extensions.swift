@@ -12,14 +12,21 @@ extension VariableDeclSyntax {
         
         /// internal scope of `lazy var ...`
         case internalLazyVar
+
+        /// defined as a protocol conformance
+        case protocolConformance
         
         static func from(_ node: VariableDeclSyntax) -> Self? {
-            if node.hasPrivateSetVar {
+            if node.isDefinedInProtocol {
+                nil
+            } else if node.hasPrivateSetVar {
                 .internalPrivateSetVar
             } else if node.hasLazyVar {
                 .internalLazyVar
             } else if node.modifiers.isEmpty {
                 .defaultInternal
+            } else if node.isDefinedAsProtocolConformance {
+                .protocolConformance
             } else {
                 nil
             }
@@ -46,6 +53,18 @@ extension VariableDeclSyntax {
         guard modifier.name.text == "lazy" else { return false }
         return true
     }
+
+    private var isDefinedInProtocol: Bool {
+        guard let _ = findAncestorNode(of: ProtocolDeclSyntax.self, baseNodeType: CodeBlockItemSyntax.self)
+        else { return false }
+        return true
+    }
+
+    private var isDefinedAsProtocolConformance: Bool {
+        guard let extNode = findAncestorNode(of: ExtensionDeclSyntax.self, baseNodeType: CodeBlockItemSyntax.self)
+        else { return false }
+        return extNode.inheritanceClause != nil
+    }
     
     static func makeNewPublicModifiers(from node: VariableDeclSyntax) -> DeclModifierListSyntax? {
         guard let pattern = MakePublicDeclPattern.from(node) else { return nil }
@@ -59,7 +78,7 @@ extension VariableDeclSyntax {
         ])
         
         switch pattern {
-        case .defaultInternal:
+        case .defaultInternal, .protocolConformance:
             break
         case .internalPrivateSetVar:
             let existingModifier = DeclModifierSyntax(
