@@ -3,7 +3,7 @@ import XCTest
 import SwiftSyntax
 import SwiftParser
 
-@testable import PublicRewriter
+@testable import PublicRewriterCore
 
 class ClassDeclSyntaxTests: XCTestCase {
     func testRewriter() throws {
