@@ -21,7 +21,7 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
-                .product(name: "PublicRewriter", package: "swift-public-rewriter"),
+                .product(name: "PublicRewriterCore", package: "swift-public-rewriter"),
             ]
         ),
         .target(name: "MyModule"),

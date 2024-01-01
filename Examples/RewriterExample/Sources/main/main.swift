@@ -3,31 +3,23 @@ import Foundation
 import SwiftSyntax
 import SwiftParser
 
-import PublicRewriter
+import PublicRewriterCore
 
-func makePublic(in source: String) throws -> String {
+private func makePublic(for fileURL: URL) throws {
+    guard fileURL.pathExtension == "swift" else { return }
+    print("🔄Modify src:\(fileURL)")
+    let source = try String(contentsOf: fileURL, encoding: .utf8)
     let sourceFile = Parser.parse(source: source)
     let rewriter = PublicModifierRewriter()
-    let modifiedSourceFile = rewriter.visit(sourceFile)
-    return modifiedSourceFile.description
+    let modified = rewriter.visit(sourceFile)
+    try modified.description.write(to: fileURL, atomically: true, encoding: .utf8)
 }
 
-func main() throws {
-    let currentDirectoryURL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-    print("current directory:\(currentDirectoryURL)")
-
-    let directoryURL = URL(fileURLWithPath: "./")
+private func main() throws {
+    let directoryURL = URL(fileURLWithPath: "./Sources/MyModule")
     let enumerator = FileManager.default.enumerator(at: directoryURL, includingPropertiesForKeys: nil)
-
     while let url = enumerator?.nextObject() as? URL {
-        guard url.pathExtension == "swift" else { continue }
-        
-        guard url.pathComponents.contains("MyModule") else { continue }
-        print("🔄 modify src:\(url)")
-
-        let sourceCode = try String(contentsOf: url, encoding: .utf8)
-        let modifiedCode = try makePublic(in: sourceCode)
-        try modifiedCode.write(to: url, atomically: true, encoding: .utf8)
+        try makePublic(for: url)
     }
 }
 

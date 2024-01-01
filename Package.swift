@@ -10,6 +10,7 @@ let package = Package(
     ],
     products: [
         .publicRewriterCLI,
+        .publicRewriterCore,
     ],
     dependencies: [
         .swiftSyntax,
@@ -27,6 +28,11 @@ private extension PackageDescription.Product {
     static let publicRewriterCLI: _Self = .executable(
         name: .LocalTarget.CLI.productName,
         targets: [.LocalTarget.CLI.targetName]
+    )
+
+    static let publicRewriterCore: _Self = .library(
+        name: .LocalTarget.publicRewriterCore,
+        targets: [.LocalTarget.publicRewriterCore]
     )
 }
 
