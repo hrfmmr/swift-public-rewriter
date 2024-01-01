@@ -5,8 +5,7 @@ import PackageDescription
 let package = Package(
     name: "swift-public-rewriter-example",
     platforms: [
-        .iOS(.v16),
-        .macOS(.v10_15),
+        .macOS(.v13),
     ],
     products: [
         .library(name: "MyModule", targets: ["MyModule"]),

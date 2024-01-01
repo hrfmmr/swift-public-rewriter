@@ -5,8 +5,7 @@ import PackageDescription
 let package = Package(
     name: "swift-public-rewriter",
     platforms: [
-        .iOS(.v16),
-        .macOS(.v10_15),
+        .macOS(.v13),
     ],
     products: [
         .publicRewriterCLI,
