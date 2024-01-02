@@ -19,7 +19,7 @@ public class PublicModifierRewriter: SyntaxRewriter {
     }
 
     override public func visit(_ node: StructDeclSyntax) -> DeclSyntax {
-        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+        if node.modifiers.contains(where: { $0.isPublic }) {
             return super.visit(node)
         }
         guard node.shouldMakePublicInExtension else { return super.visit(node) }
@@ -32,7 +32,7 @@ public class PublicModifierRewriter: SyntaxRewriter {
     }
 
     override public func visit(_ node: EnumDeclSyntax) -> DeclSyntax {
-        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+        if node.modifiers.contains(where: { $0.isPublic }) {
             return super.visit(node)
         }
         guard node.shouldMakePublicInExtension else { return super.visit(node) }
@@ -45,7 +45,7 @@ public class PublicModifierRewriter: SyntaxRewriter {
     }
     
     override public func visit(_ node: ClassDeclSyntax) -> DeclSyntax {
-        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+        if node.modifiers.contains(where: { $0.isPublic }) {
             return super.visit(node)
         }
         guard node.shouldMakePublicInExtension else { return super.visit(node) }
@@ -58,7 +58,7 @@ public class PublicModifierRewriter: SyntaxRewriter {
     }
     
     override public func visit(_ node: InitializerDeclSyntax) -> DeclSyntax {
-        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+        if node.modifiers.contains(where: { $0.isPublic }) {
             return super.visit(node)
         }
         guard let newModifiers = InitializerDeclSyntax.makeNewPublicModifiers(from: node) else { return super.visit(node)}
@@ -72,7 +72,7 @@ public class PublicModifierRewriter: SyntaxRewriter {
     }
 
     override public func visit(_ node: FunctionDeclSyntax) -> DeclSyntax {
-        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+        if node.modifiers.contains(where: { $0.isPublic }) {
             return super.visit(node)
         }
         guard let newModifiers = FunctionDeclSyntax.makeNewPublicModifiers(from: node) else { return super.visit(node) }
@@ -86,7 +86,7 @@ public class PublicModifierRewriter: SyntaxRewriter {
     }
     
     override public func visit(_ node: ExtensionDeclSyntax) -> DeclSyntax {
-        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+        if node.modifiers.contains(where: { $0.isPublic }) {
             return super.visit(node)
         }
         guard let newModifiers = ExtensionDeclSyntax.makeNewPublicModifiers(from: node) else { return super.visit(node) }
@@ -100,7 +100,7 @@ public class PublicModifierRewriter: SyntaxRewriter {
     }
     
     override public func visit(_ node: ProtocolDeclSyntax) -> DeclSyntax {
-        if node.modifiers.contains(where: { $0.name.text == "public" }) {
+        if node.modifiers.contains(where: { $0.isPublic }) {
             return super.visit(node)
         }
         guard node.modifiers.isEmpty else { return super.visit(node) }
@@ -123,5 +123,11 @@ private extension PublicModifierRewriter {
                 trailingTrivia: .spaces(1)
             )
         ])
+    }
+}
+
+private extension DeclModifierSyntax {
+    var isPublic: Bool {
+        name.text == "public"
     }
 }
