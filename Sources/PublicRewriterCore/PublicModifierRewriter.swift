@@ -25,9 +25,18 @@ public class PublicModifierRewriter: SyntaxRewriter {
         guard node.shouldMakePublicInExtension else { return super.visit(node) }
         
         guard node.modifiers.isEmpty else { return super.visit(node) }
-        let newNode = node
+        var newNode = node
             .with(\.structKeyword, .keyword(.struct, trailingTrivia: .spaces(1)))
             .with(\.modifiers, makePublicDeclModifier(leadingTrivia: node.structKeyword.leadingTrivia))
+
+        if let initializerDecl = node.makePublicInitializerMemberBlock() {
+            let newMembers = MemberBlockItemListSyntax(
+                Array(node.memberBlock.members) +
+                [MemberBlockItemSyntax(decl: initializerDecl)]
+            )
+            newNode = newNode
+                .with(\.memberBlock, node.memberBlock.with(\.members, newMembers))
+        }
         return super.visit(DeclSyntax(newNode))
     }
 
