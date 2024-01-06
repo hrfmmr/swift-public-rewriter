@@ -57,6 +57,14 @@ struct ExampleStruct {
     static func from(x: Int) -> Self {
         .init(x: x, y: 0)
     }
+
+    struct Inner {
+        let p: Int
+        let q: Int
+        var foo: Int?
+        let bar = ""
+        var baz: Int = 0
+    }
 }
 
 protocol TestProtocol {
@@ -121,6 +129,19 @@ public struct ExampleStruct {
 
     public static func from(x: Int) -> Self {
         .init(x: x, y: 0)
+    }
+
+    public struct Inner {
+        public let p: Int
+        public let q: Int
+        public var foo: Int?
+        public let bar = ""
+        public var baz: Int = 0
+
+        public init(p: Int, q: Int) {
+            self.p = p
+            self.q = q
+        }
     }
 }
 
