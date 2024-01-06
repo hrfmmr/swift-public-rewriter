@@ -1,5 +1,8 @@
 ## swift-public-rewriter
-[![Continuous Integration Status](https://github.com/hrfmmr/swift-public-rewriter/workflows/CI/badge.svg)](https://github.com/hrfmmr/swift-public-rewriter/workflows/CI/badge.svg)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/hrfmmr/swift-public-rewriter/test.yml?style=flat-square&logo=github)
+![Swift 5.9](https://img.shields.io/badge/Swift-5.9-FA7343?logo=swift&style=flat-square)
+[![Xcode 15.0](https://img.shields.io/badge/Xcode-15.0-147EFB?style=flat-square&logo=xcode&link=https%3A%2F%2Fdeveloper.apple.com%2Fxcode%2F)](https://developer.apple.com/xcode/)
+![Platforms](https://img.shields.io/badge/Platform-macOS-lightgray?logo=apple&style=flat-square)
 
 ## Overview
 swift-public-rewriter is a tool designed to perform semantic code conversions by using [SwiftSyntax](https://swiftpackageindex.com/apple/swift-syntax), automatically changing internal scope definitions in Swift source files to `public` scope.
